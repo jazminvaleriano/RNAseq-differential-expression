@@ -1,10 +1,8 @@
 01_output_counts
 02_output_HISAT2
 04_output_quant
-main.sh
 reference_genome
 01_output_FastQC
 03_output_StringTie
 06_output_int_analysis
 reads
-scripts
