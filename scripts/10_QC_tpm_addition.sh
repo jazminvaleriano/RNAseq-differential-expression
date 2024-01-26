@@ -8,4 +8,8 @@ SAMPLES_VECTOR="3_2 3_4 3_7 P1 P2 P3"
 
 for i in $SAMPLES_VECTOR
 do awk -v i=$i -F'\t' '{sum += $5} END {print "Sum of TPM for " i " =" sum}' $INPUT_DIR/${i}/abundance.tsv 
-done > $INPUT_DIR/sum_of_TPM.txt
+done > $INPUT_DIR/Total_TPM_and_transcripts.txt
+
+#Find the total identified transcripts
+# Abundance Table fetched from Sleuth shiny app
+awk '{print $1}' "$INPUT_DIR/Transcript_abundance_table.csv" | sort | uniq | wc -l | awk '{print "Total transcripts: " $1}' >> "$INPUT_DIR/Total_TPM_and_transcripts.txt"
