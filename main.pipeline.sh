@@ -48,9 +48,10 @@ sbatch scripts/08_Kallisto_index.sh
 sbatch scripts/09_Kallisto_quant.sh
 
 # STEP 5 DIFFERENTIAL EXPRESSION ------------------------
+Rscript scripts/11_Diff_Expression_Sleuth.R
 
 # STEP 6 INTEGRATIVE ANALYSIS ----------------------------
-sbatch scripts/11_create_bed_from_gtf.sh
-sbatch scripts/12_intersect_bedtools.sh
-sbatch scripts/13_protein_coding_potential.sh
-sbatch scripts/14_statistics_step6.sh
+sbatch scripts/12_create_bed_from_gtf.sh
+sbatch scripts/13_intersect_bedtools.sh
+sbatch scripts/14_protein_coding_potential.sh
+sbatch scripts/15_statistics_step6.sh
