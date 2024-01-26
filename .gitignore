@@ -6,4 +6,5 @@ reference_genome
 03_output_StringTie
 06_output_int_analysis
 reads
-.vscode
+*.vscode
+*.out

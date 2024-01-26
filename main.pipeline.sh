@@ -34,7 +34,7 @@ sbatch scripts/04_StringTie_merge.sh
 #Count the total number of exons, transcripts and genes, and single exon transcripts and genes for quality check 
 source scripts/05_counting_tr_genes.sh 
 
-# Create a transcript to genes table for downstream analyisis (Sleuth dif expression)
+# Create a transcript to genes table for downstream analyisis (Sleuth diff expression)
 source scripts/06_Transcript_to_Gene.sh
 
 # STEP 4 QUANTIFICATION-----------------------------------
@@ -47,8 +47,8 @@ sbatch scripts/08_Kallisto_index.sh
 #Quantify with kallisto 
 sbatch scripts/09_Kallisto_quant.sh
 
-#As a quality check, verify that all the TPM add up to 1 in all samples
-sbatch scripts/10_ QC_tpm_addition.sh
+#As a quality check, verify that all the TPM add up to 1M in all samples
+sbatch scripts/10_QC_tpm_addition.sh
 
 # STEP 5 DIFFERENTIAL EXPRESSION ------------------------
 #Run statistic tests on the quantification to find differentially expressed genes at transcript and gene level
