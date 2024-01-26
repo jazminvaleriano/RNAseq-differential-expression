@@ -7,7 +7,7 @@ TIECHE_RESULTS <- "/Users/jazminvaleriano/Documents/lncRNA/Tieche RNA-Seq DATA.c
 
 ## PREPARE ENVIRONMENT----------------------------------------------------------
 # List of required packages from CRAN and bioconductor:
-required_packages_cran <- c("devtools","ggplot2","ggrepel","dplyr","cowplot")
+required_packages_cran <- c("devtools","ggplot2","ggrepel","dplyr","cowplot","VennDiagram")
 required_packages_bioc <- c("rhdf5","biomaRt","EnhancedVolcano")
 
 # Function to check for packages and install from CRAN if missing
@@ -73,6 +73,8 @@ so <- sleuth_prep(samples2conditions,
 # Exploratory samples PCA and Heatmap as a quality check. 
 #sleuth_live(so)
 plot_pca(so, text_labels= T , color_by = 'condition', units= "tpm")
+ggsave('pca.sleuth.png')
+
 pdf('sample_heatmap.pdf')
 plot_sample_heatmap(so, use_filtered = TRUE, color_high = "white",
                     color_low = "dodgerblue", x_axis_angle = 50,
@@ -107,7 +109,7 @@ lrt_results <- sleuth_results(so, 'reduced:full', 'lrt', show_all = FALSE)
 
 #Filter for significant, at qval <= 0.05, and only including protein coding, novel and lncRNA genes
 biotypes_of_interest <- c("", "protein_coding", "lncRNA")
-alpha <- 0.05
+alpha <- 0.01
 
 lrt_significant_genes <- lrt_results %>%
   filter(qval <= alpha, biotype %in% biotypes_of_interest)
@@ -121,7 +123,7 @@ write.csv(lrt_significant_genes, file = "lrt_significant_genes.csv", row.names =
 
 so <- sleuth_wt(so, which_beta = 'conditionparaclonal','full')
 
-# output results
+# output results, by deactivating the option of pval_aggregate we go down to transcript level
 tr_wt_results <- sleuth_results(so, 'conditionparaclonal', test_type = 'wt', pval_aggregate = F)
 
 # Change the name of the beta value columns
@@ -137,28 +139,45 @@ write.csv(wt_significant_transcripts, file = "wt_significant_transcripts.csv", r
 # Compare results from my analysis with the one obtained by Tièche et al. (only named genes)
 tieche_results <- read.csv(TIECHE_RESULTS)
 
-# Filter significant results, and dif. expressed at a log2FoldChange threshold of 2
+# Filter significant results. 
 tieche_significant_de <- tieche_results %>%
-  filter(padj <= alpha, log2FoldChange <= -2 | log2FoldChange >= 2 )
+  filter(padj <= alpha)
 
 my_significant_de_transcripts <- tr_wt_results %>%
-  filter(qval <= alpha, log2fold_change <= -2 | log2fold_change >= 2 )
+  filter(qval <= alpha)
 
 my_significant_de_genes <- lrt_results %>%
   filter(qval <= alpha)
 
-Tieche_vs_my_transcripts <- intersect(tieche_significant_de$hgnc_symbol, 
-                                      my_significant_de_transcripts$gene_name)
-total_intersect_vs_transcripts <- length(Tieche_vs_my_transcripts)
+#Get the list of known genes identified as diff expressed in each dataset and plot them in a Venn Diagram. 
+known_genes_tieche <- unique(na.exclude(tieche_significant_de$hgnc_symbol))
+known_genes_WT <- unique(na.exclude(my_significant_de_transcripts$gene_name))
+known_genes_lrt <- unique(na.exclude(my_significant_de_genes$gene_name))
 
-Tieche_vs_my_genes <- intersect(tieche_significant_de$hgnc_symbol, 
-                                      my_significant_de_genes$gene_name)
-total_intersect_vs_genes <- length(Tieche_vs_my_genes)
+venn.diagram(x=list(known_genes_tieche,known_genes_lrt,known_genes_WT),
+             category.names = c("Tièche et al." , "WT - Transcript level " , "LRT - Gene level"),
+             filename = 'venn_diagramm.png',
+             output=TRUE,
+             fill = c(alpha("#440154ff",0.3), alpha('#21908dff',0.3), alpha('#fde725ff',0.3)),
+             )
 
-total_de_genes_Tieche <- length(unique(tieche_significant_de$hgnc_symbol))
+known_genes_df<-data.frame(Tieche=numeric(1), Gene_level=numeric(1), Transcript_level=numeric(1))
+known_genes_df$Tieche<-length(known_genes_tieche)
+known_genes_df$Gene_level<-length(known_genes_lrt)
+known_genes_df$Transcript_level<-length(known_genes_WT)
 
-percent_intersect_genes <- round(100*(total_intersect_vs_genes / total_de_genes_Tieche),2)
-percent_intersect_transcripts <- round(100*(total_intersect_vs_transcripts / total_de_genes_Tieche),2)
+intersecting_genes<-data.frame(Tieche_vs_LRT=numeric(1),Tieche_vs_WT=numeric(1),LRT_vs_WT=numeric(1))
+intersecting_genes$Tieche_vs_LRT <- length(intersect(known_genes_tieche,known_genes_lrt))
+intersecting_genes$Tieche_vs_WT <- length(intersect(known_genes_tieche,known_genes_WT))
+intersecting_genes$LRT_vs_WT <- length(intersect(known_genes_lrt,known_genes_WT))
+
+
+#Percentage of genes intersecting with those found by Tièche et al at gene level (LRT) and transcript level (WT)
+percent_genes_in_gl <- round(100*(intersecting_genes$Tieche_vs_LRT / known_genes_df$Tieche),2)
+percent_genes_in_tl <- round(100*(intersecting_genes$Tieche_vs_WT / known_genes_df$Tieche),2)
+percent_genes_in_gl
+percent_genes_in_tl
+
 
 ## VOLCANO PLOTS ---------------------------------------------------------------
 
@@ -202,3 +221,11 @@ novel_volcano <-EnhancedVolcano(novel_wt_transcript, x="log2fold_change", y="qva
                 legendPosition = 'right', legendLabSize = 12,
 )
 ggsave("novel_volcano.png",novel_volcano, width = 10, height = 8, units = "in")
+
+
+#Heat Maps--------------------
+
+
+plot_bootstrap(so, target_id, units = units, color_by = color_by,
+                x_axis_angle = 50, divide_groups = T)
+
