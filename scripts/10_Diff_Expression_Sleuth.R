@@ -206,13 +206,6 @@ ggsave("novel_volcano.png",novel_volcano, width = 10, height = 8, units = "in")
 
 #Heat Maps--------------------
 
-# target_id <- "ENST00000257555.11"  # Replace with the actual transcript or gene identifier
-# units <- "est_counts"
-# color_by <- "condition"  # Replace with the actual grouping variable in your sample metadata
-# x_axis_angle <- 50
-# divide_groups <- TRUE
-# 
-# # Call the plot_bootstrap function
-# plot_bootstrap(oe_transcript_level, target_id, units = units, color_by = color_by,
-#                x_axis_angle = x_axis_angle, divide_groups = divide_groups)
-# 
+ plot_bootstrap(oe_transcript_level, target_id, units = units, color_by = color_by,
+                x_axis_angle = x_axis_angle, divide_groups = divide_groups)
+ 
