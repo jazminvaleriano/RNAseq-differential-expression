@@ -220,15 +220,3 @@ write.csv(novel_wt_genelevel, file = "novel_wt_genelevel.csv", row.names= FALSE)
 
 heatmap(protein_coding_wt_genelevel)
 
-
-# # plot bootstrap , to account for kallisto estimation ENST00000257555.11
-# target_id <- "ENST00000257555.11"  # Replace with the actual transcript or gene identifier
-# units <- "est_counts"
-# color_by <- "condition"  # Replace with the actual grouping variable in your sample metadata
-# x_axis_angle <- 50
-# divide_groups <- TRUE
-# 
-# # Call the plot_bootstrap function
-# plot_bootstrap(oe_transcript_level, target_id, units = units, color_by = color_by,
-#                x_axis_angle = x_axis_angle, divide_groups = divide_groups)
-# 
