@@ -21,8 +21,8 @@ wget https://genome-idx.s3.amazonaws.com/hisat/hg38_genome.tar.gz
 tar -xzf hg38_genome.tar.gz ; cd ../
 #Align to reference genome usign HISAT2, then Use Samtools convert to bam, sort and index:
 sbatch scripts/02a_HISAT2_align_to_bam.sh
-#Asses quality of resulting alignment
-#sbatch scritps/02b_alignment_QC.sh
+#Asses quality of resulting alignment, and run experiment to confirm strandedness
+sbatch scritps/02b_alignment_QC.sh
 
 # STEP 3 TRANSCRIPTOME ASSEMBLY--------------------------
 # Use StringTie to create a reference-guided transcriptome assembly based on the RNA-seq for each sample
