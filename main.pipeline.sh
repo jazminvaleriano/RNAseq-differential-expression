@@ -47,11 +47,19 @@ sbatch scripts/08_Kallisto_index.sh
 #Quantify with kallisto 
 sbatch scripts/09_Kallisto_quant.sh
 
+#As a quality check, verify that all the TPM add up to 1 in all samples
+sbatch scripts/10_ QC_tpm_addition.sh
+
 # STEP 5 DIFFERENTIAL EXPRESSION ------------------------
+#Run statistic tests on the quantification to find differentially expressed genes at transcript and gene level
 Rscript scripts/11_Diff_Expression_Sleuth.R
 
 # STEP 6 INTEGRATIVE ANALYSIS ----------------------------
+#Create a set of bed files from the merged assembly gtf file with the novel and annotated genes/transcripts
 sbatch scripts/12_create_bed_from_gtf.sh
+#Use bedtools to find intergenic novel genes, and to check if they overlap with well annotated 5' and 3' ends
 sbatch scripts/13_intersect_bedtools.sh
+#Asses coding potential score for novel genes
 sbatch scripts/14_protein_coding_potential.sh
+#Create a summary file with the statistics from previous steps 
 sbatch scripts/15_statistics_step6.sh
