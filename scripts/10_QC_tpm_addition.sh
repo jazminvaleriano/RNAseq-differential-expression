@@ -12,4 +12,4 @@ done > $INPUT_DIR/Total_TPM_and_transcripts.txt
 
 #Find the total identified transcripts
 # Abundance Table fetched from Sleuth shiny app
-awk '{print $1}' "$INPUT_DIR/Transcript_abundance_table.csv" | sort | uniq | wc -l | awk '{print "Total transcripts: " $1}' >> "$INPUT_DIR/Total_TPM_and_transcripts.txt"
+awk -F',' '{print $1}' "$INPUT_DIR/Transcript_abundance_table.csv" | sort | uniq | wc -l | awk '{print "Total transcripts: " $1}' >> "$INPUT_DIR/Total_TPM_and_transcripts.txt"
