@@ -202,10 +202,3 @@ novel_volcano <-EnhancedVolcano(novel_wt_transcript, x="log2fold_change", y="qva
                 legendPosition = 'right', legendLabSize = 12,
 )
 ggsave("novel_volcano.png",novel_volcano, width = 10, height = 8, units = "in")
-
-
-#Heat Maps--------------------
-
- plot_bootstrap(oe_transcript_level, target_id, units = units, color_by = color_by,
-                x_axis_angle = x_axis_angle, divide_groups = divide_groups)
- 
