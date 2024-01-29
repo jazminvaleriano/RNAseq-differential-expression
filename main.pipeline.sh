@@ -63,3 +63,5 @@ sbatch scripts/13_intersect_bedtools.sh
 sbatch scripts/14_protein_coding_potential.sh
 #Create a summary file with the statistics from previous steps 
 sbatch scripts/15_statistics_step6.sh
+#Create a summary table with all the data generated for novel genes
+sbatch scripts/16_summary.sh
