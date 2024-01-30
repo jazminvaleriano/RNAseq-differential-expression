@@ -14,7 +14,7 @@ cd $INT_ANALYSIS_DIR
 bedtools intersect -v -a novel.bed -b annotated.bed > novel_intergenic.bed
 
 # 5 prime overlaps
-bedtools intersect -wa -s -a novel_5_TSS_window.bed -b $REFERENCES_DIR/refTSS_v4.1_human_coordinate.hg38.bed > overlap5_TSS.bed
+bedtools intersect -wa -s -a novel_5_TSS_window.bed -b $REFERENCES_DIR/refTSS_v4.1_human_coordinate.hg38.bed > overlap5_CAGE.bed
 
 # 3 prime overlaps
 bedtools intersect -wa -s -a novel_3_polyA_window.bed -b $REFERENCES_DIR/atlas.clusters.2.0.GRCh38.96.bed > overlap3_polyA.bed

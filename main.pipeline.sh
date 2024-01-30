@@ -57,7 +57,7 @@ Rscript scripts/11_Diff_Expression_Sleuth.R
 # STEP 6 INTEGRATIVE ANALYSIS ----------------------------
 #Create a set of bed files from the merged assembly gtf file with the novel and annotated genes/transcripts
 sbatch scripts/12_create_bed_from_gtf.sh
-#Use bedtools to find intergenic novel genes, and to check if they overlap with well annotated 5' and 3' ends
+#Use bedtools to find intergenic novel genes, and to check if they overlap with annotated 5' and 3' ends
 sbatch scripts/13_intersect_bedtools.sh
 #Asses coding potential score for novel genes
 sbatch scripts/14_protein_coding_potential.sh
