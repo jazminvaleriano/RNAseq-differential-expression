@@ -15,7 +15,7 @@ FILE_CPAT=/data/users/jvaleriano/lncRNA/06_output_int_analysis/protein_coding_po
 #Preprocess the input files from Sleuth, CPAT
 tail -n +2 $FILE_DIF_EXP | awk -F ',' '{print $1, $2, $5, $6, $7}' | tr -s ' ' | tr -d '"'| tr ' ' '\t'| sort > summary.de.tmp
 awk -F '\t' '{print $4, $1, $2, $3, $6}' $FILE_NOVEL_COORDINATES |tr ' "' '\t' | sort -n > sorted.coords.tmp
-tr '::' '\t' < $FILE_CPAT | awk -F '\t' '{print $1 "\t" $7}'| sort > tabbed.pcp.tmp
+tr '::' '\t' < $FILE_CPAT | awk -F '\t' '{print $1 "\t" $8}'| sort > tabbed.pcp.tmp
 
 # Join the coordinates and Sleuth results (will only conserve the transcripts included in Sleuth analysis)
 join --nocheck-order -t$'\t' sorted.coords.tmp summary.de.tmp  -a 2 | sed 's/ $//' > summary.tsv
