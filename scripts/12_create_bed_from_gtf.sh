@@ -18,7 +18,7 @@ awk '$4 ~ /ENST/' ${INT_ANALYSIS_DIR}/all_transcripts.bed > ${INT_ANALYSIS_DIR}/
 #Filter novel transcripts and save in a separate file 
 awk '$4 !~ /ENST/' ${INT_ANALYSIS_DIR}/all_transcripts.bed > ${INT_ANALYSIS_DIR}/novel.bed
 
-#create a 5´ bed file of novel transcripts with a window of +-50n, 
+#create a 5´ (TSS) bed file of novel transcripts with a window of +-50n, 
 #correcting to 0 in case the coordinates end up being negative
 awk -v window=50 '
 {
@@ -30,7 +30,7 @@ awk -v window=50 '
         end = $3 + window + 1;
     }
     printf("%s\t%d\t%d\t%s\t%s\t%s\n", $1, start, end, $4, $5, $6);
-}' ${INT_ANALYSIS_DIR}/novel.bed > ${INT_ANALYSIS_DIR}/novel_5_CAGE_window.bed
+}' ${INT_ANALYSIS_DIR}/novel.bed > ${INT_ANALYSIS_DIR}/novel_5_TSS_window.bed
 
 
 #create a 3´ (polyA site) bed file of novel transcripts with a window of +-50n, 
