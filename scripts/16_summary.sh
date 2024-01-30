@@ -31,6 +31,11 @@ join --nocheck-order -t$'\t' summary.tsv tabbed.pcp.tmp > temp && mv temp summar
 # Add heder row
 echo -e "target_id\tchr\tstart\tend\tstrand\tgene_id\tDE_pval\tDE_qval\tlog2fold_change\tintergenic\tPoly_A_match\tTSS_match\tcoding_potential" | cat - summary.tsv > temp && mv temp summary.tsv
 
+# Extract the top lncRNA candidates
+# NR==1 to leave the header out, filter by intergenic, polya and tss match, low protein coding score, and sort by column 8 (DE q value)
+awk 'NR==1 || ($10=="intergenic" && $11=="poly_a_match" && $12=="TSS_match" && $13<0.364 && $7<=0.01)' summary.tsv | sort -t$'\t' -k8n > ${OUTPUT_DIR}/lncRNA_candidates.tsv
+
+
 # Remove temporary files and save summary in output folder
 rm *tmp
 mv summary.tsv ${OUTPUT_DIR}
