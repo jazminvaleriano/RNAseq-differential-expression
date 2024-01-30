@@ -18,7 +18,7 @@ echo "Percentage of novel intergeneic transcripts: $percent %" >> int_analysis_s
 # Correct 3' and 5' annotation
 correct_3=$(wc -l < overlap3_polyA.bed)
 percent_3=$(echo "scale=2; ($correct_3/$novel_transcripts) * 100" | bc)
-correct_5=$(wc -l < overlap5_TSS.bed)
+correct_5=$(wc -l < overlap5_CAGE.bed)
 percent_5=$(echo "scale=2; ($correct_5/$novel_transcripts) * 100" | bc)
 echo "Number of correctly annotated novel transcripts at 3': $correct_3" >> int_analysis_stats.txt 
 echo "Percentage of correctly annotated novel transcripts at 3': $percent_3 %" >> int_analysis_stats.txt
