@@ -31,3 +31,27 @@ infer_experiment.py -i $EXAMPLE_BAM -r
 
 # statistics for bam files
 bam_stat.py -i /data/users/jvaleriano/lncRNA/02_output_HISAT2/sorted_3_7_alignment.bam
+
+#bam_stat OUTPUT:
+
+#==================================================
+#All numbers are READ count
+#==================================================
+
+#Total records:                          73701439
+
+#QC failed:                              0
+#Optical/PCR duplicate:                  0
+#Non primary hits                        6210483
+#Unmapped reads:                         1585506
+#mapq < mapq_cut (non-unique):           3555237
+
+#mapq >= mapq_cut (unique):              62350213
+#Read-1:                                 31449515
+#Read-2:                                 30900698
+#Reads map to '+':                       31126454
+#Reads map to '-':                       31223759
+#Non-splice reads:                       30595438
+#Splice reads:                           31754775
+#Reads mapped in proper pairs:           61118928
+#Proper-paired reads map to different chrom:0
