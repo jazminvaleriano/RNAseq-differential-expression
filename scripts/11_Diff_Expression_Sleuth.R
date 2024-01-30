@@ -5,6 +5,10 @@ KALLISTO_OUT_DIR <- "/Users/jazminvaleriano/Documents/lncRNA/kallisto_out"
 TRANSCRIPT_GENE_MAP <- "/Users/jazminvaleriano/Documents/lncRNA/Metadata/transcript_to_gene.tsv"
 TIECHE_RESULTS <- "/Users/jazminvaleriano/Documents/lncRNA/Tieche RNA-Seq DATA.csv"
 
+#Set significance value for statistic tests
+alpha <- 0.01
+
+
 ## PREPARE ENVIRONMENT----------------------------------------------------------
 # List of required packages from CRAN and bioconductor:
 required_packages_cran <- c("devtools","ggplot2","ggrepel","dplyr","cowplot","VennDiagram")
@@ -70,6 +74,8 @@ so <- sleuth_prep(samples2conditions,
                   transformation_function = function(x) log2(x + 0.5),
                   aggregation_column = 'gene_id',)
 
+## DATA EXPLORATION ------------------------------------------------------------
+
 # Exploratory samples PCA and Heatmap as a quality check. 
 #sleuth_live(so)
 plot_pca(so, text_labels= T , color_by = 'condition', units= "tpm")
@@ -87,6 +93,7 @@ transcript_abundance_table<-kallisto_table(so, use_filtered = FALSE, normalized 
                include_covariates = TRUE)
 write.csv(transcript_abundance_table, file = "Transcript_abundance_table.csv", row.names = FALSE)
 
+## MODEL FIT AND DIFF EXP ANALYSIS ---------------------------------------------
 # Fit the full model to  “smooth” the raw kallisto abundance estimates for each sample 
 # using a linear model with a parameter that represents the experimental condition 
 # (in this case parental vs paraclonal)
@@ -107,15 +114,32 @@ so <- sleuth_lrt(so, 'reduced', 'full')
 # Examine the significant results (gene level)
 lrt_results <- sleuth_results(so, 'reduced:full', 'lrt', show_all = FALSE)
 
-#Filter for significant, at qval <= 0.05, and only including protein coding, novel and lncRNA genes
-biotypes_of_interest <- c("", "protein_coding", "lncRNA")
-alpha <- 0.01
-
-lrt_significant_genes <- lrt_results %>%
-  filter(qval <= alpha, biotype %in% biotypes_of_interest)
-
+#Filter for significant
+lrt_significant <- lrt_results %>%filter(qval <= alpha)
 # Save significant results in a csv
-write.csv(lrt_significant_genes, file = "lrt_significant_genes.csv", row.names = FALSE)
+write.csv(lrt_significant, file = "wt_significant.csv", row.names = FALSE)
+#Count unique genes identified
+total_de_genes_gl<-length(unique(lrt_significant$gene_name))
+
+#Subset for lncRNA, novel and protein coding 
+
+lncRNA_lrt_significant<- subset(lrt_significant, biotype == "lncRNA")
+write.csv(lncRNA_lrt_significant, file = "lncRNA_lrt_significant.csv", row.names = FALSE)
+lrt_num_significant_lncRNA <- length(unique(lncRNA_lrt_significant$gene_name))
+
+protein_coding_lrt_significant<- subset(lrt_significant, biotype == "protein_coding")
+write.csv(protein_coding_lrt_significant, file = "protein_coding_lrt_significant.csv", row.names = FALSE)
+lrt_num_significant_pc <- length(unique(protein_coding_lrt_significant$gene_name))
+
+novel_lrt_significant<- subset(lrt_significant, biotype=="novel")
+write.csv(novel_lrt_significant, file = "novel_lrt_significant.csv", row.names= FALSE)
+lrt_num_significant_novel <- length(unique(novel_lrt_significant$gene_name))
+
+cat("Total DE genes at gene level LRT analysis:", total_de_genes_gl,"\n",
+    "Total DE lncRNA at gene level LRT analysis:", lrt_num_significant_lncRNA,"\n",
+    "Total DE protein coding at gene level LRT analysis:", lrt_num_significant_pc,"\n",
+    "Total DE novel genes at gene level LRT analysis:", lrt_num_significant_novel)
+
 
 # Wald test for differential expression: This function computes the Wald test on 
 # one specific ‘beta’ coefficient on every transcript; this offers beta values 
@@ -130,29 +154,51 @@ tr_wt_results <- sleuth_results(so, 'conditionparaclonal', test_type = 'wt', pva
 names(tr_wt_results)[names(tr_wt_results) == "b"] <- "log2fold_change"
 names(tr_wt_results)[names(tr_wt_results) == "se_b"] <- "se_log2fold_change"
 
-# Filter results for significant only, and biotypes of interest. 
-wt_significant_transcripts <- tr_wt_results %>%
-  filter(qval <= alpha, biotype %in% biotypes_of_interest)
-write.csv(wt_significant_transcripts, file = "wt_significant_transcripts.csv", row.names = FALSE)
+# Filter results for significant 
+wt_significant <- tr_wt_results %>%  filter(qval <= alpha)
+write.csv(wt_significant, file = "wt_significant.csv", row.names = FALSE)
+total_de_genes_tl<-length(unique(wt_significant$gene_name))
 
-# QUALITY CHECK 
-# Compare results from my analysis with the one obtained by Tièche et al. (only named genes)
+
+lncRNA_wt_significant<- subset(wt_significant, biotype == "lncRNA")
+write.csv(lncRNA_wt_significant, file = "lncRNA_wt_significant.csv", row.names = FALSE)
+wt_num_significant_lncRNA <- length(unique(lncRNA_wt_significant$gene_name))
+
+protein_coding_wt_significant<- subset(wt_significant, biotype == "protein_coding")
+write.csv(protein_coding_wt_significant, file = "protein_coding_lrt_significant.csv", row.names = FALSE)
+wt_num_significant_pc <- length(unique(protein_coding_wt_significant$gene_name))
+
+novel_wt_significant<- subset(wt_significant, biotype=="novel")
+write.csv(novel_wt_significant, file = "novel_wt_significant.csv", row.names= FALSE)
+wt_num_significant_novel <- length(unique(novel_wt_significant$gene_name))
+
+cat("Total DE genes at transcript level WT analysis:", total_de_genes_tl,"\n",
+    "Total DE lncRNA at gene level LRT analysis:", wt_num_significant_lncRNA,"\n",
+    "Total DE protein coding at gene level LRT analysis:", wt_num_significant_pc,"\n",
+    "Total DE novel genes at gene level LRT analysis:", wt_num_significant_novel)
+
+## QUALITY CHECK---------------------------------------------------------------- 
+# Compare results from my analysis with the one obtained by Tièche et al. (only named/annotated genes)
 tieche_results <- read.csv(TIECHE_RESULTS)
+tieche_results$hgnc_symbol <- ifelse(tieche_results$hgnc_symbol == "", 
+                                     tieche_results$ensembl_gene_id,
+                                     tieche_results$hgnc_symbol)
+
 
 # Filter significant results. 
 tieche_significant_de <- tieche_results %>%
   filter(padj <= alpha)
 
-my_significant_de_transcripts <- tr_wt_results %>%
+wt_significant_transcripts <- tr_wt_results %>%
   filter(qval <= alpha)
 
-my_significant_de_genes <- lrt_results %>%
+wt_significant <- lrt_results %>%
   filter(qval <= alpha)
 
 #Get the list of known genes identified as diff expressed in each dataset and plot them in a Venn Diagram. 
 known_genes_tieche <- unique(na.exclude(tieche_significant_de$hgnc_symbol))
-known_genes_WT <- unique(na.exclude(my_significant_de_transcripts$gene_name))
-known_genes_lrt <- unique(na.exclude(my_significant_de_genes$gene_name))
+known_genes_WT <- unique(na.exclude(wt_significant_transcripts$gene_name))
+known_genes_lrt <- unique(na.exclude(wt_significant$gene_name))
 
 venn.diagram(x=list(known_genes_tieche,known_genes_lrt,known_genes_WT),
              category.names = c("Tièche et al." , "WT - Transcript level " , "LRT - Gene level"),
@@ -160,6 +206,16 @@ venn.diagram(x=list(known_genes_tieche,known_genes_lrt,known_genes_WT),
              output=TRUE,
              fill = c(alpha("#440154ff",0.3), alpha('#21908dff',0.3), alpha('#fde725ff',0.3)),
              )
+
+#Venn diagram with only the top 20 most significant results from Tieche
+top100_genes_tieche <- head(unique(na.exclude(tieche_significant_de$hgnc_symbol)),100)
+venn.diagram(x=list(top100_genes_tieche,known_genes_WT,known_genes_lrt),
+             category.names = c("Tièche et al." , "WT - Transcript level " , "LRT - Gene level"),
+             filename = 'venn_diagramm_top.png',
+             output=TRUE,
+             fill = c(alpha("#440154ff",0.3), alpha('#21908dff',0.3), alpha('#fde725ff',0.3)),
+)
+
 
 known_genes_df<-data.frame(Tieche=numeric(1), Gene_level=numeric(1), Transcript_level=numeric(1))
 known_genes_df$Tieche<-length(known_genes_tieche)
@@ -189,7 +245,7 @@ write.csv(lncRNA_wt_transcript, file = "lncRNA_wt_transcript.csv", row.names = F
 protein_coding_wt_transcript <- subset(tr_wt_results, biotype == "protein_coding")
 write.csv(protein_coding_wt_transcript, file = "protein_coding_wt_transcript.csv", row.names = FALSE)
 
-novel_wt_transcript <- subset(tr_wt_results, gene_name=="")
+novel_wt_transcript <- subset(tr_wt_results, biotype =="novel")
 write.csv(novel_wt_transcript, file = "novel_wt_transcript.csv", row.names= FALSE)
 
 
@@ -197,7 +253,7 @@ library(EnhancedVolcano)
 
 lncRNA_volcano <-EnhancedVolcano(lncRNA_wt_transcript, x="log2fold_change", y="qval", 
                 pCutoff = alpha, FCcutoff = 2,
-                title = "lncRNA differential expression parental vs paraclonal",
+                title = "A",
                 lab=lncRNA_wt_transcript$gene_name, labSize = 6,
                 drawConnectors = T, 
                 legendPosition = 'right', legendLabSize = 12,
@@ -206,7 +262,7 @@ ggsave("lncRNA_volcano_plot.png",lncRNA_volcano, width = 10, height = 8, units =
 
 protein_coding_volcano<-EnhancedVolcano(protein_coding_wt_transcript, x="log2fold_change", y="qval", 
                 pCutoff = alpha, FCcutoff = 2,
-                title = "Protein Coding genes differential expression parental vs paraclonal",
+                title = "B",
                 lab=protein_coding_wt_transcript$gene_name, labSize = 6,
                 drawConnectors = T, 
                 legendPosition = 'right', legendLabSize = 12,
@@ -215,17 +271,16 @@ ggsave("protein_coding_volcano.png",protein_coding_volcano, width = 10, height =
 
 novel_volcano <-EnhancedVolcano(novel_wt_transcript, x="log2fold_change", y="qval", 
                 pCutoff = alpha , FCcutoff = 2,
-                title = " Novel genes differential expression parental vs paraclonal",
+                title = "C",
                 lab=novel_wt_transcript$gene_id, labSize = 6,
                 drawConnectors = T, 
                 legendPosition = 'right', legendLabSize = 12,
 )
+
 ggsave("novel_volcano.png",novel_volcano, width = 10, height = 8, units = "in")
 
+## BOOTSTRAP PLOT --------------------------------------------------------------
+plot_bootstrap(so, target_id="MSTRG.19367.2", units = "tpm", x_axis_angle = 50, divide_groups = T)
+#sleuth_live(so)
 
-#Heat Maps--------------------
-
-
-plot_bootstrap(so, target_id, units = units, color_by = color_by,
-                x_axis_angle = 50, divide_groups = T)
 
