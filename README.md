@@ -80,9 +80,11 @@ As a quality check, verify that all the TPM add up to 1M in all samples
 
 ## Step 5. Differential Expression
 Run statistic tests on the quantification to find differentially expressed genes at transcript and gene level
-This step was run locally on R studio. 
+This step was run locally on R studio. The input files can be found in this repository (R_sleuth input), or in the IBU cluster:
 
-	 Rscript scripts/11_Diff_Expression_Sleuth.R
+ 	/data/users/jvaleriano/lncRNA/R_Sleuth_input
+	
+ Rscript: scripts/11_Diff_Expression_Sleuth.R
 
 ## Step 6. Integrative analysis 
 Create a set of bed files from the merged assembly gtf file with the novel and annotated genes/transcripts
