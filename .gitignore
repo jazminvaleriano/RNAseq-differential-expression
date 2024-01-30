@@ -4,3 +4,4 @@
 *.tmp
 reference_genome
 reads
+main*
