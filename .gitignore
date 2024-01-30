@@ -4,4 +4,4 @@
 *.tmp
 reference_genome
 reads
-main*
+main.pipeline.sh
