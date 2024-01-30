@@ -28,3 +28,6 @@ infer_experiment.py -i $EXAMPLE_BAM -r
 # a template for the subsequent steps, leading to this pattern of read mapping.
 #A small fraction (0.74%) aligns with a second-strand synthesis pattern, but this is likely too small to be significant 
 #or could be due to technical variations or artifacts.
+
+# statistics for bam files
+bam_stat.py -i /data/users/jvaleriano/lncRNA/02_output_HISAT2/sorted_3_7_alignment.bam
