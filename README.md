@@ -1,12 +1,12 @@
 # Differential expression analyisis, annotation and characterization of lncRNAs in lung cancer
-In this project, two subpopulations of the common NSCLC line A549—paraclonal and parental— were analyzed. The main goals were to identify the differentially expressed genes, and to characterize the unannotated genes, looking for novel lncRNAs candidates. 
+In this project, two subpopulations of the common NSCLC line A549—paraclonal and parental— were analyzed to identify the differentially expressed genes, and to characterize the unannotated genes, looking for novel lncRNAs candidates. 
 
 In brief, the pipeline consists of 3 major steps: 
 - Assembly of RNA transcriptome
 - Differential expression analysis
 - Characterization of the resulting novel genes based on their genomic context, expression level and protein coding potential. 
 
-The RNA libraries were prepared and sequenced by Tièche et al., and were retrieved from DOI: 10.1016/j.neo.2018.09.008
+The RNA libraries were prepared and sequenced by Tièche et al. [DOI: 10.1016/j.neo.2018.09.008](https://data.mendeley.com/datasets/s8gn3b9xt9/1)
 
 This repository is part of the final project for the RNA-sequencing course (467713-HS2023) at the University of Bern. 
 
